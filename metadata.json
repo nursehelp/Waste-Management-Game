@@ -1,0 +1,8 @@
+{
+  "name": "Remix Hospital Waste Segregation Game",
+  "description": "A fun, scenario-based minigame to teach correct hospital waste segregation while managing cost impact.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
