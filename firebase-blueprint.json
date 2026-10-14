@@ -1,0 +1,66 @@
+{
+  "entities": {
+    "AuditRecord": {
+      "title": "AuditRecord",
+      "description": "Hospital waste segregation game audit record tracking pre- and post- game attempt accuracy, scores, and missegregated waste items",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique record identifier"
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "Unique session identifier for the participant"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "ISO timestamp when the audit round was completed"
+        },
+        "scenario": {
+          "type": "string",
+          "description": "Clinical department scenario (e.g. Minor Treatment Room, Operating Theatre)"
+        },
+        "attemptType": {
+          "type": "string",
+          "description": "1st Attempt (Baseline) or 2nd Attempt (Post-training)"
+        },
+        "score": {
+          "type": "number",
+          "description": "Total points accumulated in the round"
+        },
+        "totalItems": {
+          "type": "number",
+          "description": "Number of items sorted"
+        },
+        "accuracyPercent": {
+          "type": "number",
+          "description": "Accuracy percentage achieved"
+        },
+        "wastedCost": {
+          "type": "number",
+          "description": "Financial waste/penalty incurred in GBP"
+        },
+        "correctCount": {
+          "type": "number",
+          "description": "Count of items placed in correct bins"
+        },
+        "incorrectCount": {
+          "type": "number",
+          "description": "Count of items placed in wrong bins"
+        },
+        "timeSpentSeconds": {
+          "type": "number",
+          "description": "Time elapsed during the round in seconds"
+        }
+      },
+      "required": ["id", "sessionId", "timestamp", "attemptType", "score", "totalItems", "accuracyPercent"]
+    }
+  },
+  "firestore": {
+    "/audit_records/{recordId}": {
+      "schema": "AuditRecord",
+      "description": "Collection storing hospital waste segregation audit sessions and training attempt records"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "name": "Remix Hospital Waste Segregation Game",
-  "description": "A fun, scenario-based minigame to teach correct hospital waste segregation while managing cost impact.",
+  "name": "Hospital Waste Segregation Training & Audit",
+  "description": "Hospital clinical waste segregation training game and audit analytics comparing pre- and post-training scores.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

@@ -8,7 +8,9 @@ import {
 
 export const AUDIT_ACCESS_PIN = '42774252';
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
+const DATA_DIR = process.env.VERCEL 
+  ? path.resolve('/tmp', 'data') 
+  : path.resolve(process.cwd(), 'data');
 const DATA_FILE = path.resolve(DATA_DIR, 'audit_records.json');
 
 export function initAuditStorage(): AuditRecord[] {

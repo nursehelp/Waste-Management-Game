@@ -49,9 +49,14 @@ export function AuditDashboard({ onBack, onManageItems }: AuditDashboardProps) {
         setIsAuthenticated(true);
         setVerifiedPin(pin.trim());
         setIsLoadingData(true);
-        const data = await fetchAuditAnalytics(pin.trim());
-        setAnalytics(data);
-        setIsLoadingData(false);
+        try {
+          const data = await fetchAuditAnalytics(pin.trim());
+          setAnalytics(data);
+        } catch (analyticsErr) {
+          console.warn('Could not load analytics immediately:', analyticsErr);
+        } finally {
+          setIsLoadingData(false);
+        }
       } else {
         setAuthError('Incorrect PIN code. Please enter the authorized PIN.');
       }
@@ -68,8 +73,8 @@ export function AuditDashboard({ onBack, onManageItems }: AuditDashboardProps) {
     try {
       const data = await fetchAuditAnalytics(verifiedPin);
       setAnalytics(data);
-    } catch {
-      // Ignored
+    } catch (err) {
+      console.warn('Error refreshing audit analytics:', err);
     } finally {
       setIsLoadingData(false);
     }
@@ -84,18 +89,24 @@ export function AuditDashboard({ onBack, onManageItems }: AuditDashboardProps) {
       return;
     }
 
+    const isValid = await verifyAuditPin(wipePin);
+    if (!isValid) {
+      setWipeError('Incorrect PIN code. Wipe authorization failed.');
+      return;
+    }
+
     setIsWiping(true);
     try {
       await resetAuditData(wipePin.trim());
       setShowWipeModal(false);
       setWipePin('');
-      setWipeSuccessMsg('All audit records have been permanently wiped. Starting fresh.');
+      setWipeSuccessMsg('All audit records have been permanently wiped from cloud and local storage. Starting fresh.');
       
       // Refresh analytics to 0
       const freshData = await fetchAuditAnalytics(verifiedPin);
       setAnalytics(freshData);
     } catch {
-      setWipeError('Incorrect PIN or unable to wipe data. Please verify your PIN.');
+      setWipeError('Unable to wipe data. Please verify your connection and try again.');
     } finally {
       setIsWiping(false);
     }
@@ -175,9 +186,12 @@ export function AuditDashboard({ onBack, onManageItems }: AuditDashboardProps) {
         {/* Top Header */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 p-4 sm:p-6 rounded-2xl shadow-xs">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border border-emerald-300">
                 Verified Manager Session
+              </span>
+              <span className="bg-blue-100 text-blue-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border border-blue-300 flex items-center gap-1">
+                <span>☁️ Google Cloud Backed Up</span>
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#002f6c] tracking-tight">
@@ -229,6 +243,19 @@ export function AuditDashboard({ onBack, onManageItems }: AuditDashboardProps) {
             >
               <Trash2 size={14} />
               <span>Wipe All Data</span>
+            </button>
+
+            <button 
+              onClick={() => {
+                setIsAuthenticated(false);
+                setPin('');
+                setVerifiedPin('');
+              }}
+              title="Lock Audit Portal"
+              className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl text-xs font-bold border border-slate-300 transition-colors"
+            >
+              <Lock size={14} />
+              <span>Lock</span>
             </button>
 
             <button 
