@@ -6,7 +6,7 @@ import { DroppableBin } from './DroppableBin';
 import { DraggableItem } from './DraggableItem';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
-import { ArrowLeft, Clock, Flame, ShieldAlert, Sparkles } from 'lucide-react';
+import { ArrowLeft, Clock, Flame, ShieldAlert, Sparkles, AlertTriangle } from 'lucide-react';
 
 export interface GameMistake {
   itemName: string;
@@ -30,16 +30,18 @@ export interface GameResults {
 interface GameProps {
   items: WasteItem[];
   scenario: string;
+  attemptType?: '1st Attempt' | '2nd Attempt';
   onComplete: (results: GameResults) => void;
   onExit: () => void;
 }
 
-export function Game({ items, scenario, onComplete, onExit }: GameProps) {
+export function Game({ items, scenario, attemptType = '1st Attempt', onComplete, onExit }: GameProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [wastedCost, setWastedCost] = useState(0);
   const [mistakes, setMistakes] = useState<GameMistake[]>([]);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   
   const [feedback, setFeedback] = useState<{ type: 'correct' | 'incorrect'; message: string; costImpact?: string } | null>(null);
   const [activeItem, setActiveItem] = useState<WasteItem | null>(null);
@@ -201,18 +203,27 @@ export function Game({ items, scenario, onComplete, onExit }: GameProps) {
       <header className="bg-[#005eb8] text-white shadow-md px-3 py-2.5 sm:px-6 sm:py-3 z-30 shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-2.5">
           {/* Left: Back button + Scenario */}
-          <div className="flex items-center justify-between md:justify-start gap-3">
+          <div className="flex items-center justify-between md:justify-start gap-2.5 sm:gap-3 flex-wrap">
             <button
-              onClick={onExit}
-              className="text-xs sm:text-sm font-bold flex items-center gap-1.5 text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl transition-colors border border-white/20"
+              onClick={() => setShowExitConfirm(true)}
+              className="text-xs sm:text-sm font-bold flex items-center gap-1.5 text-white bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-xl transition-colors border border-white/20 cursor-pointer"
             >
               <ArrowLeft size={16} /> Exit
             </button>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm sm:text-base font-black text-white flex items-center gap-1.5">
-                🏥 <span className="truncate max-w-[180px] sm:max-w-xs">{scenario === 'All' ? 'Mixed Scenarios' : scenario}</span>
+                🏥 <span className="truncate max-w-[120px] sm:max-w-xs">{scenario === 'All' ? 'Mixed Scenarios' : scenario}</span>
               </span>
-              <span className="text-xs bg-black/20 text-white px-2.5 py-0.5 rounded-md font-mono hidden sm:inline-flex items-center gap-1">
+              {attemptType === '2nd Attempt' ? (
+                <span className="bg-amber-400 text-slate-950 font-black text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs animate-pulse">
+                  ⚡ Round 2 of 2 (Mandatory)
+                </span>
+              ) : (
+                <span className="bg-white/20 text-white font-bold text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-xs">
+                  🎯 Round 1 of 2 (Baseline)
+                </span>
+              )}
+              <span className="text-xs bg-black/20 text-white px-2.5 py-0.5 rounded-md font-mono hidden md:inline-flex items-center gap-1">
                 <Clock size={12} /> {formatTime(secondsElapsed)}
               </span>
             </div>
@@ -353,6 +364,52 @@ export function Game({ items, scenario, onComplete, onExit }: GameProps) {
           {activeItem ? <DraggableItem item={activeItem} /> : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Exit Confirmation Modal */}
+      <AnimatePresence>
+        {showExitConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-xs">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-sm w-full p-5 shadow-2xl border-2 border-rose-400 text-center"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+                <AlertTriangle size={26} />
+              </div>
+
+              <h3 className="text-lg font-black text-slate-900 mb-1">
+                Abandon Current Round?
+              </h3>
+              
+              <p className="text-xs text-slate-600 font-medium mb-4 leading-relaxed">
+                {attemptType === '2nd Attempt' 
+                  ? 'Round 2 is mandatory for audit verification! Exiting now will invalidate your audit record and mark this training session as incomplete.' 
+                  : 'Leaving now will lose your current game progress and baseline audit data.'}
+              </p>
+
+              <div className="space-y-2">
+                <button
+                  onClick={() => setShowExitConfirm(false)}
+                  className="w-full bg-[#005eb8] hover:bg-[#004d99] text-white py-2.5 px-4 rounded-xl font-bold text-xs shadow-md active:scale-98 cursor-pointer"
+                >
+                  Continue Playing Round
+                </button>
+                <button
+                  onClick={() => {
+                    setShowExitConfirm(false);
+                    onExit();
+                  }}
+                  className="w-full bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 py-2.5 px-4 rounded-xl font-bold text-xs transition-colors cursor-pointer"
+                >
+                  Quit to Home (Abandon Round)
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

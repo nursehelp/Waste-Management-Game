@@ -19,6 +19,7 @@ export default function App() {
   const [sessionId, setSessionId] = useState(() => Math.random().toString(36).substring(2, 10));
   const [attemptType, setAttemptType] = useState<'1st Attempt' | '2nd Attempt'>('1st Attempt');
   const [results, setResults] = useState<GameResults | null>(null);
+  const [round1Results, setRound1Results] = useState<GameResults | null>(null);
 
   useEffect(() => {
     setInventory(getInventory());
@@ -28,12 +29,16 @@ export default function App() {
     // Starting fresh baseline session (Round 1)
     setSelectedScenario(scenario);
     setAttemptType('1st Attempt');
+    setRound1Results(null);
     setSessionId(Math.random().toString(36).substring(2, 10));
     setCurrentItems(getRandomItems(inventory, scenario, 10));
     setGameState('playing');
   };
 
   const handleGameComplete = async (gameResults: GameResults) => {
+    if (attemptType === '1st Attempt') {
+      setRound1Results(gameResults);
+    }
     setResults(gameResults);
 
     // Save to backend cloud database immediately
@@ -92,9 +97,11 @@ export default function App() {
         <Game 
           items={currentItems} 
           scenario={selectedScenario} 
+          attemptType={attemptType}
           onComplete={handleGameComplete} 
           onExit={() => {
             setAttemptType('1st Attempt');
+            setRound1Results(null);
             setGameState('start');
           }} 
         />
@@ -103,11 +110,13 @@ export default function App() {
       {gameState === 'summary' && results && (
         <SummaryScreen 
           results={results} 
+          round1Results={round1Results}
           attemptType={attemptType}
           onRestart={handleRestart} 
           onNewScenarios={handleNewScenarios} 
           onExit={() => {
             setAttemptType('1st Attempt');
+            setRound1Results(null);
             setGameState('start');
           }} 
         />

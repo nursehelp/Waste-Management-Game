@@ -71,19 +71,24 @@ export function StartScreen({ inventory, onStart, onOpenAudit }: StartScreenProp
         </p>
 
         {/* Audit Stats Banner */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto mb-7 p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center shadow-xs">
-          <div>
-            <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase block">Method</span>
-            <span className="text-xs sm:text-sm font-extrabold text-[#005eb8]">Interactive</span>
+        <div className="max-w-lg mx-auto mb-7">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center shadow-xs">
+            <div>
+              <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase block">Round 1</span>
+              <span className="text-xs sm:text-sm font-extrabold text-[#005eb8]">Baseline Test</span>
+            </div>
+            <div className="border-x border-slate-200">
+              <span className="text-[10px] sm:text-xs text-rose-600 font-bold uppercase block">Round 2</span>
+              <span className="text-xs sm:text-sm font-extrabold text-rose-700">⚡ Mandatory</span>
+            </div>
+            <div>
+              <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase block">Audit Result</span>
+              <span className="text-xs sm:text-sm font-extrabold text-emerald-700">Progression %</span>
+            </div>
           </div>
-          <div className="border-x border-slate-200">
-            <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase block">Target Time</span>
-            <span className="text-xs sm:text-sm font-extrabold text-emerald-700">~2 Minutes</span>
-          </div>
-          <div>
-            <span className="text-[10px] sm:text-xs text-slate-500 font-bold uppercase block">Audit</span>
-            <span className="text-xs sm:text-sm font-extrabold text-slate-800">100% Anonymous</span>
-          </div>
+          <p className="text-[11px] text-slate-500 font-medium mt-1.5 text-center">
+            ⚠️ Staff Audit Requirement: You must complete both rounds to validate hospital compliance.
+          </p>
         </div>
 
         {/* Scenario Selection Grid */}
