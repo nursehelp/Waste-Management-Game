@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Play, BarChart3, Share2, Check, Sparkles, ShieldCheck } from 'lucide-react';
+import { Play, BarChart3, Sparkles, ShieldCheck } from 'lucide-react';
 import { WasteItem, getUniqueScenarios } from '../data/inventory';
+import { ShareModal, WhatsAppIcon } from './ShareModal';
 
 interface StartScreenProps {
   inventory: WasteItem[];
@@ -10,14 +11,8 @@ interface StartScreenProps {
 }
 
 export function StartScreen({ inventory, onStart, onOpenAudit }: StartScreenProps) {
-  const [copied, setCopied] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const scenarios = getUniqueScenarios(inventory);
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.origin);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-[#f0f4f8] text-slate-900 p-3 sm:p-6 font-sans relative overflow-x-hidden selection:bg-blue-700 selection:text-white">
@@ -37,16 +32,18 @@ export function StartScreen({ inventory, onStart, onOpenAudit }: StartScreenProp
 
         <div className="flex items-center gap-2">
           <button
-            onClick={handleCopyLink}
-            className="flex items-center gap-1.5 bg-white hover:bg-slate-100 border border-slate-300 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 transition-colors shadow-xs"
+            onClick={() => setIsShareModalOpen(true)}
+            className="flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100/90 active:bg-emerald-200 border border-emerald-300 text-emerald-900 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow-sm active:scale-95"
+            title="Invite staff on WhatsApp to play twice for audit tracking"
           >
-            {copied ? <Check size={14} className="text-emerald-600" /> : <Share2 size={14} className="text-[#005eb8]" />}
-            <span className="hidden xs:inline">{copied ? 'Link Copied!' : 'Share Link'}</span>
+            <WhatsAppIcon size={15} className="text-[#25D366] shrink-0" />
+            <span className="hidden xs:inline">Invite Staff (WhatsApp)</span>
+            <span className="xs:hidden">Invite</span>
           </button>
 
           <button
             onClick={onOpenAudit}
-            className="flex items-center gap-1.5 bg-[#005eb8] hover:bg-[#004d99] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors shadow-xs"
+            className="flex items-center gap-1.5 bg-[#005eb8] hover:bg-[#004d99] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors shadow-xs active:scale-95"
           >
             <BarChart3 size={14} />
             <span>Audit</span>
@@ -151,6 +148,12 @@ export function StartScreen({ inventory, onStart, onOpenAudit }: StartScreenProp
         </div>
 
       </motion.div>
+
+      {/* WhatsApp Staff Invite & Audit Tracking Modal */}
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+      />
     </div>
   );
 }

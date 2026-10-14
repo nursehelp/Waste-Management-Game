@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameResults } from './Game';
 import { motion } from 'motion/react';
-import { RefreshCcw, LayoutGrid, AlertCircle, Share2, ShieldCheck, TrendingUp } from 'lucide-react';
+import { RefreshCcw, LayoutGrid, AlertCircle, ShieldCheck, TrendingUp } from 'lucide-react';
+import { ShareModal, WhatsAppIcon } from './ShareModal';
 
 interface SummaryProps {
   results: GameResults;
@@ -18,13 +19,7 @@ export function SummaryScreen({
   onExit,
   attemptType
 }: SummaryProps) {
-  const [copied, setCopied] = React.useState(false);
-
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.origin);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const isFirstAttempt = attemptType === '1st Attempt';
 
@@ -122,13 +117,19 @@ export function SummaryScreen({
           </button>
 
           <button 
-            onClick={handleCopyLink} 
-            className="sm:col-span-2 text-xs text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 py-1.5 font-semibold"
+            onClick={() => setIsShareModalOpen(true)} 
+            className="sm:col-span-2 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl flex items-center justify-center gap-2 py-2.5 font-bold transition-all active:scale-98"
           >
-            <Share2 size={13} /> {copied ? 'Copied training link!' : 'Share training link with hospital team'}
+            <WhatsAppIcon size={15} className="text-[#25D366]" /> 
+            <span>Invite Team on WhatsApp (Ask Staff to Play Twice)</span>
           </button>
         </div>
       </motion.div>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+      />
     </div>
   );
 }
